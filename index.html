@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./node_modules/nes.css/css/nes.min.css">
+    <!-- <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com"> -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <title>Document</title>
+    <style>
+        html,
+        body {
+            background-color: black;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        #game-console {
+            display: block;
+            margin: auto;
+            position: relative;
+            width: 800px;
+            height: 400px;
+            background: url(./images/ba2.png) no-repeat center;
+            background-position: left top;
+        }
+
+
+        #game {
+            width: 500px;
+            height: 285px;
+            cursor: url(./images/icon.png) 50 50, auto;
+            background-image: url(./images/ba2.jpg);
+            /* background-color: white; */
+            top: 8%;
+            left: 19%;
+            overflow: hidden;
+            position: absolute;
+        }
+
+        #game2 {
+            width: 500px;
+            height: 285px;
+            background-image: url(./images/sw3.gif);
+            z-index: 2;
+            top: 8%;
+            left: 19%;
+            overflow: hidden;
+            position: absolute;
+        }
+
+        #game img {
+            width: 100px;
+            height: 100px;
+            margin-top: 50px;
+            display: block;
+            position: absolute;
+        }
+
+
+        #btn-start {
+            text-align: center;
+            font-size: 20px;
+            width: 150px;
+            background: whitesmoke;
+            line-height: 40px;
+            padding: 0;
+            position: absolute;
+            top: 70%;
+            left: 46%;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        #btn-start:hover {
+            background: rgb(190, 178, 180);
+            color: black;
+            font-size: 15px;
+        }
+
+        p {
+            color: whitesmoke;
+            font-size: 30px;
+            position: absolute;
+            top: 100px;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        h1 {
+            color: whitesmoke;
+            font-size: 20px;
+            position: absolute;
+            top: 170px;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        h2 {
+            color: red;
+            font-size: 22px;
+            position: absolute;
+            top: 80%;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        span {
+            color: yellow;
+            font-size: 25px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-console">
+        <div id="game2"></div>
+        <div id="game"></div>
+    </div>
+
+    <input type="button" value="Start" id="btn-start">
+    <br>
+    <p>Score: <span id="text-score">0</span>
+        You have: <span id="text-time">0</span> seconds left
+    </p>
+    <h1> Highest score player: <span id="highscore-player">-</span>
+        score: <span id="highscore-score">-</span>
+    </h1>
+
+    <h2>
+        Pikachu=+1 Eevee=+2 Magikarp=-1
+    </h2>
+    <script src="./jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+        // $('#game2').show()
+        let score = 0
+        // 遊戲時間
+        let countdown = 15
+        // 倒數計時
+        let timer = 0
+
+        // 計分器
+        let highscore = { name: '', score: 0 }
+        const highStorage = JSON.parse(localStorage.getItem('wam'))
+
+        if (highStorage !== null) {
+            highscore = highStorage
+            $('#highscore-player').text(highscore.name)
+            $('#highscore-score').text(highscore.score)
+
+        }
+
+
+        // 決定寶可夢隨機移動位置
+        const move = (pika) => {
+            pika.stop().animate({
+                left: Math.round(Math.random() * 70) + '%',
+                top: Math.round(Math.random() * 70) + '%'
+            }, 5000, function () {
+                move(pika)
+            })
+        }
+
+
+        // 按按鈕隱藏封面圖
+        $('#btn-start').click(function () {
+            $(this).attr('disabled', true)
+            $('#game2').hide()
+
+
+            // 重設
+            score = 0
+            $('#text-score').text(score)
+            countdown = 15
+            $('#text-time').text(countdown)
+
+            timer = setInterval(() => {
+                // 倒數
+                countdown--
+                $('#text-time').text(countdown)
+
+                // 隨機產生皮卡丘
+                let rand = Math.round(Math.random() * 20)
+                if (rand > 10 && $('#game img').length < 20) {
+                    const pika = $(`<img src="./images/pika2.gif" alt="" style="left:${Math.round(Math.random() * 70)}%;top:${Math.round(Math.random() * 70)}%">`)
+                    $('#game').append(pika)
+                    move(pika)
+                }
+                // 隨機產生伊布
+                let randman = Math.round(Math.random() * 10)
+                if (randman > 1 && $('#game img').length < 10) {
+                    const pika = $(`<img src="./images/ibu.gif" alt="" style="left:${Math.round(Math.random() * 70)}%;top:${Math.round(Math.random() * 70)}%">`)
+                    $('#game').append(pika)
+                    move(pika)
+                }
+                // 隨機產生鯉魚王
+                let randman2 = Math.round(Math.random() * 5)
+                if (randman2 > 1 && $('#game img').length < 5) {
+                    const pika = $(`<img src="./images/fish.gif" alt="" style="left:${Math.round(Math.random() * 70)}%;top:${Math.round(Math.random() * 70)}%">`)
+                    $('#game').append(pika)
+                    move(pika)
+                }
+
+                // 時間到
+                if (countdown <= 0) {
+                    clearInterval(timer)
+                    Swal.fire({
+                        title: 'Times up',
+                        text: `You get ${score} score `
+                    })
+                    $('#game img').remove()
+                    $('#game2').show()
+                    $(this).attr('disabled', false)
+                    if (score > highscore.score) {
+
+                        highscore.score = score
+                        highscore.name = prompt('Highest score ! Please enter your name')
+                        if (highscore.name === null || highscore.name.length === 0) {
+                            highscore.name = 'Nameless'
+                        }
+                        // highscore = highStorage
+                        $('#highscore-player').text(highscore.name)
+                        $('#highscore-score').text(highscore.score)
+                        localStorage.setItem('wam', JSON.stringify(highscore))
+                    }
+                }
+            }, 1000);
+        })
+
+        $('#game').on('click', 'img', function () {
+            // 點到伊布+2分
+            if ($(this).attr("src") == "./images/ibu.gif") {
+                score += 2
+                $('#text-score').text(score)
+                $(this).attr('src', './images/icone.gif').animate({ marginTop: 30 })
+                $(this).attr('src', './images/icone.gif').animate({ marginTop: 500 })
+                $(this).stop()
+            } else if (
+                // 點到鯉魚王-分
+                $(this).attr("src") == "./images/fish.gif") {
+                score--
+                $('#text-score').text(score)
+                $(this).attr('src', './images/iconf.gif').animate({ marginTop: 30 })
+                $(this).attr('src', './images/iconf.gif').animate({ marginTop: 500 })
+                $(this).stop()
+            } else {
+                $(this).stop()
+                // 忽略點擊事件、無法點擊和選取
+                $(this).css({
+                    'user-select': 'none',
+                    '-webkit-user-drag': 'none',
+                    'pointer-events': 'none'
+                })
+                score++
+                $('#text-score').text(score)
+                $(this).attr('src', './images/iconp.gif').animate({ marginTop: 30 })
+                $(this).attr('src', './images/iconp.gif').animate({ marginTop: 500 })
+            }
+        })
+
+
+
+    </script>
+</body>
+
+</html>
